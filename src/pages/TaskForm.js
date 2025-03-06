@@ -13,6 +13,11 @@ const TaskForm = ({ token }) => {
   return (
     <form onSubmit={handleSubmit}>
       <input type="text" placeholder="Task Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+      <select name="assigned_to" value={task.assigned_to} onChange={handleChange}>
+        {users.map(user => (
+          <option key={user.id} value={user.id}>{user.name}</option>
+        ))}
+      </select>
       <button type="submit">Add Task</button>
     </form>
   );
