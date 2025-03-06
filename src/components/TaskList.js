@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchTasks, updateTask, deleteTask } from "../api";
 import { cable } from "../socket";
+import useTaskUpdates from "../hooks/useTaskUpdates";
 
 const TaskList = ({ token }) => {
   const [tasks, setTasks] = useState([]);
@@ -24,6 +25,15 @@ const TaskList = ({ token }) => {
 
     return () => subscription.unsubscribe();
   }, [token]);
+
+  useTaskUpdates((updatedTask) => {
+    setTasks((prevTasks) => {
+      const existingTask = prevTasks.find((t) => t.id === updatedTask.id);
+      return existingTask
+        ? prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+        : [...prevTasks, updatedTask];
+    });
+  });
 
   return (
     <div className="p-4">
