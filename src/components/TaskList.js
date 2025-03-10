@@ -5,6 +5,8 @@ import useTaskUpdates from "../hooks/useTaskUpdates";
 
 const TaskList = ({ token }) => {
   const [tasks, setTasks] = useState([]);
+  const [notification, setNotification] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null); // Track task to delete
 
   useEffect(() => {
     fetchTasks(token).then((response) => setTasks(response.data));
@@ -20,24 +22,53 @@ const TaskList = ({ token }) => {
         } else if (data.action === "deleted") {
           setTasks((prev) => prev.filter((task) => task.id !== data.task.id));
         }
-      },
+      }
     });
 
     return () => subscription.unsubscribe();
   }, [token]);
 
-  useTaskUpdates((updatedTask) => {
-    setTasks((prevTasks) => {
-      const existingTask = prevTasks.find((t) => t.id === updatedTask.id);
-      return existingTask
-        ? prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
-        : [...prevTasks, updatedTask];
-    });
-  });
+  useTaskUpdates(
+    (updatedTask) => {
+      setTasks((prevTasks) => {
+        const existingTask = prevTasks.find((t) => t.id === updatedTask.id);
+        if (existingTask) {
+          setNotification(`"${updatedTask.title}" was updated.`);
+          return prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t));
+        } else {
+          setNotification(`"${updatedTask.title}" was created.`);
+          return [...prevTasks, updatedTask];
+        }
+      });
+      setTimeout(() => setNotification(null), 3000);
+    },
+    (deletedTaskId) => {
+      const deletedTask = tasks.find((task) => task.id === deletedTaskId);
+      setTasks((prevTasks) => prevTasks.filter((t) => t.id !== deletedTaskId));
+      if (deletedTask) {
+        setNotification(`"${deletedTask.title}" was deleted.`);
+        setTimeout(() => setNotification(null), 3000);
+      }
+    }
+  );
+
+  // Function to confirm deletion
+  const handleDelete = (taskId) => {
+    setConfirmDelete(taskId);
+  };
+
+  // Function to proceed with deletion
+  const confirmDeleteTask = async () => {
+    if (confirmDelete) {
+      await deleteTask(confirmDelete, token); // Call API to delete task
+      setConfirmDelete(null);
+    }
+  };
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold mb-3">Tasks</h2>
+      {notification && <div className="notification">{notification}</div>}
       <ul className="space-y-2">
         {tasks.map((task) => (
           <li key={task.id} className="p-3 border rounded-md flex justify-between items-center">
@@ -59,6 +90,15 @@ const TaskList = ({ token }) => {
           </li>
         ))}
       </ul>
+
+      {/* Confirmation Popup */}
+      {confirmDelete && (
+        <div className="popup">
+          <p>Are you sure you want to delete this task?</p>
+          <button onClick={confirmDeleteTask}>Yes, Delete</button>
+          <button onClick={() => setConfirmDelete(null)}>Cancel</button>
+        </div>
+      )}
     </div>
   );
 };

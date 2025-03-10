@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { fetchTasks } from "./api";
+import React, { useEffect, useState } from "react";
+import { fetchTasks } from "../api";
 
 const Notifications = ({ token }) => {
   const [notifications, setNotifications] = useState([]);

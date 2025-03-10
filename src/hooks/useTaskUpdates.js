@@ -1,17 +1,25 @@
 import { useEffect } from "react";
-import actionCable from "@rails/actioncable";
+import { createConsumer } from "@rails/actioncable";
 
-const useTaskUpdates = (onUpdate) => {
+const useTaskUpdates = (onUpdate, onDelete) => {
   useEffect(() => {
-    const cable = actionCable.createConsumer("ws://localhost:3000/cable");
+    const cable = createConsumer("ws://localhost:3000/cable"); 
     const subscription = cable.subscriptions.create("TaskUpdatesChannel", {
-      received: (task) => onUpdate(task),
+      received: (task) => {
+        if (task.deleted) {
+          onDelete(task.id);
+        } else {
+          onUpdate(task);
+        }
+      },
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [onUpdate]);
+  }, [onUpdate, onDelete]);
+
+  return null; // Ensure the hook returns something valid
 };
 
 export default useTaskUpdates;
