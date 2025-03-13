@@ -37,3 +37,15 @@
   margin-bottom: 10px;
 }
 
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filters select,
+.filters input {
+  padding: 5px;
+  font-size: 14px;
+}
+

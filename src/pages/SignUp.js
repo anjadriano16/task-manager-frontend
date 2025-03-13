@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 
-const Signup = () => {
+const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -14,7 +14,8 @@ const Signup = () => {
       await api.post("/users", { user: { email, password } });
       navigate("/login");
     } catch (err) {
-      setError("Signup failed. Try again.");
+      console.error("Signup error:", err.response.data); // Log error response
+      setError("Sign up failed. Try again.");
     }
   };
 
@@ -52,4 +53,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignUp;

@@ -7,7 +7,7 @@ export const api = axios.create({
 });
 
 export const login = (email, password) => api.post("/login", { email, password });
-export const signup = (email, password) => api.post("/users", { user: { email, password } });
+export const signup = (email, password) => api.post("/users", { user: { email, password, password_confirmation: password, } });
 export const fetchTasks = (token) => api.get("/tasks", { headers: { Authorization: `Bearer ${token}` } });
 export const createTask = (task, token) =>
   api.post("/tasks", task, { headers: { Authorization: `Bearer ${token}` } });

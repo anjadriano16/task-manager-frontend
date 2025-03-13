@@ -7,6 +7,9 @@ const TaskList = ({ token }) => {
   const [tasks, setTasks] = useState([]);
   const [notification, setNotification] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null); // Track task to delete
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchTasks(token).then((response) => setTasks(response.data));
@@ -65,12 +68,38 @@ const TaskList = ({ token }) => {
     }
   };
 
+  // Filter tasks based on category, due date, and search term
+  const filteredTasks = tasks.filter((task) => {
+    return (
+      (filterCategory ? task.category === filterCategory : true) &&
+      (filterDate ? task.due_date === filterDate : true) &&
+      (searchTerm ? task.title.toLowerCase().includes(searchTerm.toLowerCase()) : true)
+    );
+  });
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold mb-3">Tasks</h2>
       {notification && <div className="notification">{notification}</div>}
+
+      {/* Filter and Search Controls */}
+      <div className="filters">
+        <select onChange={(e) => setFilterCategory(e.target.value)}>
+          <option value="">All Categories</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Shopping">Shopping</option>
+        </select>
+        <input type="date" onChange={(e) => setFilterDate(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      
       <ul className="space-y-2">
-        {tasks.map((task) => (
+        {filteredTasks.map((task) => (
           <li key={task.id} className="p-3 border rounded-md flex justify-between items-center">
             <span>{task.title} - {task.completed ? "✅" : "❌"}</span>
             <div>

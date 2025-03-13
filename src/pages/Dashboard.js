@@ -1,6 +1,6 @@
 import React from "react";
 import TaskList from "../components/TaskList";
-import TaskForm from "../pages/TaskForm";
+import TaskForm from './TaskForm'
 import Navbar from "../components/Navbar";
 
 const Dashboard = ({ token }) => {
